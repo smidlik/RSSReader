@@ -1,8 +1,13 @@
 package gui;
 
+import model.RSSItem;
+import model.RSSList;
+import org.xml.sax.SAXException;
 import utils.FileUtils;
+import utils.RSSParser;
 
 import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,10 +22,12 @@ public class MainFrame extends JFrame {
 
     private JLabel lblErrorMessage;
     private JTextField txtPathField;
+    private RSSList rssList;
 
     public MainFrame() {
         init();
     }
+
 
 
 
@@ -68,10 +75,21 @@ public class MainFrame extends JFrame {
 
         btnSave.addActionListener(e -> {
             if(validateInput()) {
+                /*
                 try {
                     FileUtils.saveStringToFile(txtPathField.getText(), txtContent.getText().getBytes(StandardCharsets.UTF_8));
                 } catch (IOException e1) {
                     showErrorMessage(IO_SAVE_TYPE);
+                    e1.printStackTrace();
+                }*/
+                try {
+                    rssList = new RSSParser().getParseRSS(txtPathField.getText());
+                    txtContent.setText("");
+                    for (RSSItem allItem : rssList.getAllItems()) {
+                        txtContent.append(String.format("%s - Autor: "));
+
+                    }
+                } catch (IOException | SAXException | ParserConfigurationException e1) {
                     e1.printStackTrace();
                 }
             }

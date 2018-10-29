@@ -1,7 +1,7 @@
 package model;
 
 public class RSSItem {
-    private String item;
+    private String title;
     private String link;
     private String description;
     private String pubDate;
@@ -10,12 +10,12 @@ public class RSSItem {
     public RSSItem() {
     }
 
-    public String getItem() {
-        return item;
+    public String getTitle() {
+        return title;
     }
 
-    public void setItem(String item) {
-        this.item = item;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getLink() {
