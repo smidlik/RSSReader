@@ -4,6 +4,8 @@ import model.RSSItem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.VetoableChangeListener;
 
 public class CardView extends JPanel {
@@ -23,6 +25,19 @@ public class CardView extends JPanel {
         setTitle(item.getTitle());
         setDescription(item.getDescription());
         setAdditionlInfo(String.format("%s - %s",item.getAutor(),item.getPubDate()));
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(e.getButton()==MouseEvent.BUTTON1){
+                    if(e.getClickCount() ==2 && !e.isConsumed()){
+                        e.consume();
+
+                        new DetailFrame(item);
+                    }
+                }
+            }
+        });
     }
 
     public Color setColor(RSSItem item){
