@@ -2,16 +2,18 @@ package gui;
 
 import model.RSSItem;
 import model.RSSList;
+import model.RSSSource;
 import org.xml.sax.SAXException;
-import utils.FileUtils;
 import utils.RSSParser;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFrame extends JFrame {
 
@@ -20,8 +22,13 @@ public class MainFrame extends JFrame {
     private static final String IO_SAVE_TYPE = "IO_SAVE_TYPE";
 
     private JLabel lblErrorMessage;
-    private JTextField txtPathField;
+    private JComboBox source;
     private RSSList rssList;
+
+    private AddFrame addFrame;
+
+    private List<RSSSource> sourceList;
+    private List<String> sourceName;
 
 
     public MainFrame() {
@@ -44,31 +51,46 @@ public class MainFrame extends JFrame {
 
     private void initUI() {
         JPanel controlPanel = new JPanel(new BorderLayout());
-        JPanel btnPanel = new JPanel(new BorderLayout());
+        JPanel btnPanel = new JPanel(new WrapLayout());
+        sourceName=new ArrayList<>();
+        sourceList = new ArrayList<>();
 
-        JButton btnLoad = new JButton("Load");
-        txtPathField = new JTextField();
-        JButton btnSave = new JButton("Save");
-        JButton btnParse = new JButton("Parse");
+        JButton btnAdd = new JButton("Add");
+        source = new JComboBox(sourceName.toArray());
+        JButton btnEdit = new JButton("Edit");
+        JButton btnDelete = new JButton("Delete");
         lblErrorMessage = new JLabel();
         lblErrorMessage.setForeground(Color.RED);
         lblErrorMessage.setHorizontalAlignment(SwingConstants.CENTER);
 
-        controlPanel.add(btnLoad, BorderLayout.WEST);
-        controlPanel.add(txtPathField, BorderLayout.CENTER);
 
-        btnPanel.add(btnSave, BorderLayout.WEST);
-        btnPanel.add(btnParse, BorderLayout.EAST);
-        controlPanel.add(btnPanel,BorderLayout.EAST);
 
-        controlPanel.add(lblErrorMessage, BorderLayout.SOUTH);
+
+        btnPanel.add(btnAdd);
+        btnPanel.add(btnEdit);
+        btnPanel.add(btnDelete);
+
+        btnAdd.addActionListener(e -> {
+            addFrame=new  AddFrame();
+            sourceList.add(new RSSSource(addFrame.getName(),addFrame.getSource()));
+        });
+        for (RSSSource rssSource : sourceList) {
+            source.addItem(rssSource.getName());
+
+        }
+
+        controlPanel.add(source, BorderLayout.PAGE_START);
+
+        controlPanel.add(btnPanel,BorderLayout.CENTER);
+
+        controlPanel.add(lblErrorMessage, BorderLayout.PAGE_END);
 
         add(controlPanel, BorderLayout.NORTH);
         JPanel content = new JPanel(new WrapLayout());
 
 
         try {
-            rssList = new RSSParser().getParseRSS("rss.xml");
+            rssList = new RSSParser().getParseRSS("https://www.zive.cz/rss/sc-47/");
             for (RSSItem item : rssList.getAllItems()) {
                 content.add(new CardView(item));
             }
@@ -78,21 +100,6 @@ public class MainFrame extends JFrame {
             e1.printStackTrace();
         }
 
-      btnParse.addActionListener(e -> {
-            if(validateInput()) {
-                try {
-                    rssList = new RSSParser().getParseRSS(txtPathField.getText());
-                    for (RSSItem item : rssList.getAllItems()) {
-                        content.add(new CardView(item));
-                    }
-
-                    add(new JScrollPane(content), BorderLayout.CENTER);
-
-                } catch (IOException | SAXException | ParserConfigurationException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
 
 
 
@@ -101,10 +108,10 @@ public class MainFrame extends JFrame {
 
 
 /*
-        btnLoad.addActionListener(e -> {
+        btnAdd.addActionListener(e -> {
             if(validateInput()) {
                 try {
-                    txtContent.setText(FileUtils.loadStringFromFile(txtPathField.getText()));
+                    txtContent.setText(FileUtils.loadStringFromFile(source.getText()));
                 } catch (IOException e1) {
                     showErrorMessage(IO_LOAD_TYPE);
                     e1.printStackTrace();
@@ -112,11 +119,11 @@ public class MainFrame extends JFrame {
             }
         });
 
-        btnSave.addActionListener(e -> {
+        btnEdit.addActionListener(e -> {
             if(validateInput()) {
 
                 try {
-                    FileUtils.saveStringToFile(txtPathField.getText(), txtContent.getText().getBytes(StandardCharsets.UTF_8));
+                    FileUtils.saveStringToFile(source.getText(), txtContent.getText().getBytes(StandardCharsets.UTF_8));
                 } catch (IOException e1) {
                     showErrorMessage(IO_SAVE_TYPE);
                     e1.printStackTrace();
@@ -145,15 +152,15 @@ public class MainFrame extends JFrame {
         lblErrorMessage.setVisible(true);
     }
 
-    private boolean validateInput(){
-        lblErrorMessage.setVisible(false);
-        if(txtPathField.getText().trim().isEmpty()) {
-            showErrorMessage(VALIDATION_TYPE);
-            return false;
-        }
-        lblErrorMessage.setVisible(false);
-        return true;
-    }
+//    private boolean validateInput(){
+//        lblErrorMessage.setVisible(false);
+//        if(source.getText().trim().isEmpty()) {
+//            showErrorMessage(VALIDATION_TYPE);
+//            return false;
+//        }
+//        lblErrorMessage.setVisible(false);
+//        return true;
+//    }
 
 
 }

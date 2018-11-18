@@ -29,6 +29,7 @@ public class DetailFrame extends JFrame {
         setTitle("Článek");
         setSize(400,600);
         setLocationRelativeTo(null);
+        setUndecorated(true);
         setVisible(true);
 
         Container pane = this.getContentPane();
