@@ -21,7 +21,8 @@ public class CardView extends JPanel {
     public CardView(RSSItem item){
         setLayout(new WrapLayout());
         setSize(ITEM_WIDTH, HEIGHT);
-        setBackground(setColor(item));
+        setBackground(Color.RED);
+//        setBackground(setColor(item));
         setTitle(item.getTitle());
         setDescription(item.getDescription());
         setAdditionlInfo(String.format("%s - %s",item.getAutor(),item.getPubDate()));

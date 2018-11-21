@@ -1,6 +1,7 @@
 package gui;
 
 import model.RSSItem;
+import model.RSSSource;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -21,14 +22,16 @@ public class AddFrame extends JFrame {
 
     private String name;
     private String source;
+    private MainFrame frame;
 
 
 
-    public AddFrame(){
-        init();
+    public AddFrame(MainFrame frame){
+        initAdd();
+        this.frame=frame;
     }
 
-    private void init() {
+    private void initAdd() {
         setTitle("Přidat zdroj");
         setSize(400,200);
         setLocationRelativeTo(null);
@@ -52,8 +55,14 @@ public class AddFrame extends JFrame {
         add.addActionListener(e -> {
             name = txtName.getText();
             source = txtSource.getText();
+
+            frame.addSource(new RSSSource(name,source));
+
             dispose();
+
         });
+
+
 
 
 

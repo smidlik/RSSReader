@@ -11,6 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,28 +23,26 @@ public class MainFrame extends JFrame {
     private static final String IO_LOAD_TYPE = "IO_LOAD_TYPE";
     private static final String IO_SAVE_TYPE = "IO_SAVE_TYPE";
 
-    private JLabel lblErrorMessage;
-    private JComboBox source;
-    private RSSList rssList;
 
-    private AddFrame addFrame;
+    private JLabel lblErrorMessage;
+    private JComboBox<String> comboBox;
+    private RSSList rssList;
+    private RSSSource source;
 
     private List<RSSSource> sourceList;
-    private List<String> sourceName;
-
+    private String sourceName;
 
     public MainFrame() {
         init();
     }
 
 
-
-
     private void init() {
-     setTitle("RSS Reader");
-     setSize(800,600);
-     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-     setLocationRelativeTo(null);
+        setTitle("RSS Reader");
+        setSize(800, 600);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        setLocationRelativeTo(null);
 
         initUI();
 
@@ -52,53 +52,64 @@ public class MainFrame extends JFrame {
     private void initUI() {
         JPanel controlPanel = new JPanel(new BorderLayout());
         JPanel btnPanel = new JPanel(new WrapLayout());
-        sourceName=new ArrayList<>();
+
         sourceList = new ArrayList<>();
 
-        JButton btnAdd = new JButton("Add");
-        source = new JComboBox(sourceName.toArray());
+
+        sourceList.add(new RSSSource("Živě.cz", "https://www.zive.cz/rss/sc-47/"));
+        sourceList.add(new RSSSource("Letem Světem Applem", "http://letemsvetemapplem.eu/feed.xml"));
+        sourceList.add(new RSSSource("Lupa", "https://www.lupa.cz/rss/clanky/"));
+        sourceList.add(new RSSSource("Novinky.cz", "https://www.novinky.cz/rss/"));
+
+        JButton btnAdd = new JButton("Přidat");
         JButton btnEdit = new JButton("Edit");
-        JButton btnDelete = new JButton("Delete");
+        JButton btnDelete = new JButton("Smazat");
+
+        comboBox = new JComboBox<>();
+
+
+        for (RSSSource rssSource : sourceList) {
+            comboBox.addItem(rssSource.getName());
+            if (rssSource.getName().equalsIgnoreCase(comboBox.getSelectedItem().toString())) {
+                source = rssSource;
+            }
+        }
+
+
         lblErrorMessage = new JLabel();
         lblErrorMessage.setForeground(Color.RED);
         lblErrorMessage.setHorizontalAlignment(SwingConstants.CENTER);
 
-
-
+        
 
         btnPanel.add(btnAdd);
         btnPanel.add(btnEdit);
         btnPanel.add(btnDelete);
 
         btnAdd.addActionListener(e -> {
-            addFrame=new  AddFrame();
-            sourceList.add(new RSSSource(addFrame.getName(),addFrame.getSource()));
+            new AddFrame(this);
+            // if(addFrame.getName()!=null)sourceList.add(new RSSSource(addFrame.getName(),addFrame.getSource()));
         });
-        for (RSSSource rssSource : sourceList) {
-            source.addItem(rssSource.getName());
 
-        }
+        controlPanel.add(comboBox, BorderLayout.PAGE_START);
 
-        controlPanel.add(source, BorderLayout.PAGE_START);
-
-        controlPanel.add(btnPanel,BorderLayout.CENTER);
+        controlPanel.add(btnPanel, BorderLayout.CENTER);
 
         controlPanel.add(lblErrorMessage, BorderLayout.PAGE_END);
 
         add(controlPanel, BorderLayout.NORTH);
-        JPanel content = new JPanel(new WrapLayout());
 
+        contentWrite();
 
-        try {
-            rssList = new RSSParser().getParseRSS("https://www.zive.cz/rss/sc-47/");
-            for (RSSItem item : rssList.getAllItems()) {
-                content.add(new CardView(item));
+        comboBox.addItemListener(e -> {
+            for (RSSSource rssSource : sourceList) {
+                if (rssSource.getName().equalsIgnoreCase(comboBox.getSelectedItem().toString())) {
+                    source = rssSource;
+                }
             }
-            add(new JScrollPane(content), BorderLayout.CENTER);
+            contentWrite();
 
-        } catch (IOException | SAXException | ParserConfigurationException e1) {
-            e1.printStackTrace();
-        }
+        });
 
 
 
@@ -111,7 +122,7 @@ public class MainFrame extends JFrame {
         btnAdd.addActionListener(e -> {
             if(validateInput()) {
                 try {
-                    txtContent.setText(FileUtils.loadStringFromFile(source.getText()));
+                    txtContent.setText(FileUtils.loadStringFromFile(comboBox.getText()));
                 } catch (IOException e1) {
                     showErrorMessage(IO_LOAD_TYPE);
                     e1.printStackTrace();
@@ -123,7 +134,7 @@ public class MainFrame extends JFrame {
             if(validateInput()) {
 
                 try {
-                    FileUtils.saveStringToFile(source.getText(), txtContent.getText().getBytes(StandardCharsets.UTF_8));
+                    FileUtils.saveStringToFile(comboBox.getText(), txtContent.getText().getBytes(StandardCharsets.UTF_8));
                 } catch (IOException e1) {
                     showErrorMessage(IO_SAVE_TYPE);
                     e1.printStackTrace();
@@ -132,9 +143,24 @@ public class MainFrame extends JFrame {
         });*/
 
     }
+    private void contentWrite(){
+        JPanel content = new JPanel(new WrapLayout());
+
+        try {
+            rssList = new RSSParser().getParseRSS(source.getSource());
+            for (RSSItem item : rssList.getAllItems()) {
+                content.add(new CardView(item));
+            }
+            add(new JScrollPane(content), BorderLayout.CENTER);
+
+        } catch (IOException | SAXException | ParserConfigurationException e1) {
+            e1.printStackTrace();
+        }
+    }
+
     private void showErrorMessage(String type) {
         String message;
-        switch(type){
+        switch (type) {
             case VALIDATION_TYPE:
                 message = "Zadávací pole nemůže být prázdné!";
                 break;
@@ -154,7 +180,7 @@ public class MainFrame extends JFrame {
 
 //    private boolean validateInput(){
 //        lblErrorMessage.setVisible(false);
-//        if(source.getText().trim().isEmpty()) {
+//        if(comboBox.getText().trim().isEmpty()) {
 //            showErrorMessage(VALIDATION_TYPE);
 //            return false;
 //        }
@@ -163,4 +189,16 @@ public class MainFrame extends JFrame {
 //    }
 
 
+    public void setSourceList(List<RSSSource> sourceList) {
+        this.sourceList = sourceList;
+    }
+
+    public List<RSSSource> getSourceList() {
+        return sourceList;
+    }
+
+    public void addSource(RSSSource source) {
+        sourceList.add(source);
+        this.comboBox.addItem(source.getName());
+    }
 }

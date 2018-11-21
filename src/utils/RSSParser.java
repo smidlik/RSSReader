@@ -15,8 +15,8 @@ public class RSSParser {
     private RSSList rssList;
     private ItemHandler itemHandler;
 
-    public RSSParser(){
-        this.rssList=new RSSList();
+    public RSSParser() {
+        this.rssList = new RSSList();
         this.itemHandler = new ItemHandler(rssList);
     }
 
@@ -24,11 +24,12 @@ public class RSSParser {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
 
-
-        parser.parse(new InputSource(new URL(source).openStream()), itemHandler);
-//        parser.parse(new File(source), itemHandler);
+        //if (source.contains("http"))
+            parser.parse(new InputSource(new URL(source).openStream()), itemHandler);
+       // else parser.parse(new File(source), itemHandler);
 
     }
+
     public RSSList getParseRSS(String source) throws IOException, SAXException, ParserConfigurationException {
         parse(source);
         return rssList;
