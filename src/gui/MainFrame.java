@@ -30,6 +30,7 @@ public class MainFrame extends JFrame {
     private RSSList rssList;
     private RSSSource source;
     private JPanel content;
+    private JOptionPane dialog;
 
     private List<RSSSource> sourceList;
     private String sourceName;
@@ -68,10 +69,10 @@ public class MainFrame extends JFrame {
             showErrorMessage(IO_LOAD_TYPE);
         }
 
-        sourceList.add(new RSSSource("Živě.cz", "https://www.zive.cz/rss/sc-47/"));
-        sourceList.add(new RSSSource("Letem Světem Applem", "http://letemsvetemapplem.eu/feed.xml"));
-        sourceList.add(new RSSSource("Lupa", "https://www.lupa.cz/rss/clanky/"));
-        sourceList.add(new RSSSource("Novinky.cz", "https://www.novinky.cz/rss/"));
+//        sourceList.add(new RSSSource("Živě.cz", "https://www.zive.cz/rss/sc-47/"));
+//        sourceList.add(new RSSSource("Letem Světem Applem", "http://letemsvetemapplem.eu/feed.xml"));
+//        sourceList.add(new RSSSource("Lupa", "https://www.lupa.cz/rss/clanky/"));
+//        sourceList.add(new RSSSource("Novinky.cz", "https://www.novinky.cz/rss/"));
 
         JButton btnAdd = new JButton("Přidat");
         JButton btnRef = new JButton("Refresh");
@@ -106,15 +107,12 @@ public class MainFrame extends JFrame {
             new AddFrame(this);
         });
         btnDelete.addActionListener(e -> {
-            sourceList.remove(source);
-            comboBox.removeItem(comboBox.getSelectedItem());
+            removeSource(source,true);
         });
 
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AddFrame();
-            }
+        btnEdit.addActionListener(e -> {
+            new AddFrame(this,source);
+
         });
 
         btnRef.addActionListener(e -> contentWrite());
@@ -139,7 +137,19 @@ public class MainFrame extends JFrame {
 
 
     }
+    private void removeSource(RSSSource source,boolean ask){
+        if (JOptionPane.showConfirmDialog(null, "Opravdu chcete odstranit zdroj?", "Varování",
+                JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                removeSource(source);
+        } else {
+            // no option
+        }
+    }
+    protected void removeSource(RSSSource source){
 
+        sourceList.remove(source);
+        comboBox.removeItem(source.getName());
+    }
     private void contentWrite() {
         if (sourceList!=null) {
             content.removeAll();
