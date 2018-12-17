@@ -17,12 +17,15 @@ public class CardView extends JPanel {
     final String startHtml = "<html><p style='width: "+COMPONENT_WIDTH +"px'>";
     final String endHtml = "</p></html>";
 
+    private int r;
+    private int g;
+    private int b;
 
     public CardView(RSSItem item){
         setLayout(new WrapLayout());
         setSize(ITEM_WIDTH, HEIGHT);
         setBackground(Color.RED);
-//        setBackground(setColor(item));
+        setBackground(setColor(item));
         setTitle(item.getTitle());
         setDescription(item.getDescription());
         setAdditionlInfo(String.format("%s - %s",item.getAutor(),item.getPubDate()));
@@ -42,25 +45,23 @@ public class CardView extends JPanel {
     }
 
     public Color setColor(RSSItem item){
-        int r;
-        int g;
-        int b;
-        r = item.getAutor().length()*23;
-        g = item.getDescription().length()*2;
-        b = item.getTitle().length()*4;
+
+        r = item.getTitle().length()*18;
+        g = item.getTitle().length()*12;
+        b = item.getDescription().length();
 
         while (r>255)
         {
-            r -= 125;
+            r -= 225;
         }
         while (g>255)
         {
-            g -= 125;
+            g -= 225;
 
         }
         while (b>255)
         {
-            b -= 125;
+            b -= 50;
 
         }
         return new Color(r,g,b);
@@ -85,7 +86,7 @@ public class CardView extends JPanel {
         lblInfo.setFont(new Font("Courier",Font.ITALIC,10));
         lblInfo.setSize(COMPONENT_WIDTH,HEIGHT);
         lblInfo.setText(String.format("%s%s%s",startHtml,info,endHtml));
-        lblInfo.setForeground(Color.LIGHT_GRAY);
+        lblInfo.setForeground(new Color(255-r,255-g,255-b));
         add(lblInfo);
     }
 

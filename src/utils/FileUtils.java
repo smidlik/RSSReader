@@ -31,6 +31,7 @@ public class FileUtils {
         List<RSSSource> sources = new ArrayList<>();
         new BufferedReader(new StringReader(loadStringFromFile(CONFIG_FILE)))
                 .lines().forEach(source ->{
+            System.out.println(source);
             String[] parts = source.split(";");
             sources.add(new RSSSource(parts[0],parts[1]));
         });

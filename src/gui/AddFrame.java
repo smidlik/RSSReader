@@ -14,6 +14,9 @@ import java.awt.event.MouseEvent;
 
 public class AddFrame extends JFrame {
 
+    private static final String NAME = "NAME";
+    private static final String SOURCE = "SOURCE";
+
     private JTextField txtName;
     private JTextField txtSource;
     private JButton add;
@@ -56,30 +59,23 @@ public class AddFrame extends JFrame {
             name = txtName.getText();
             source = txtSource.getText();
 
-            frame.addSource(new RSSSource(name,source));
-
+            if (isValidated(name,NAME)&&isValidated(source,SOURCE))
+                frame.addSource(new RSSSource(name,source));
             dispose();
 
         });
 
+    }
+    private boolean isValidated(String s,String item){
+        switch (item){
+            case "NAME":
+                return false;
+            case "SOURCE":
+                return s.contains("https");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                default:
+                    return false;
+        }
     }
     public String getName(){
         return name;
